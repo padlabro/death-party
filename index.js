@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const PORT = prosecc.env.PORT || 3000;
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const sock = require('./sock.js');
@@ -14,6 +15,6 @@ io.sockets.on('connection', function (socket) {
 	console.log('Connection');
 	sock.initGame(io, socket);
 });
-http.listen(3000, function () {
+http.listen(PORT, function () {
 	console.log('listening on *:3000');
 });
