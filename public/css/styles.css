@@ -29,7 +29,7 @@ div{
 .modal__start{
 	z-index: 100;
 	position: absolute;
-	background-image: url(/img/screenshot_codepoet_02-02-17_00-38-42_l01_escape.png);
+	background-image: black;
 	width: 100%;
 	height: 100%;
 }
