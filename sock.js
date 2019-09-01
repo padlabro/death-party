@@ -22,7 +22,7 @@ exports.initGame = function (sio, socket) {
 			socketid: id,
 			players: [],
 			playersPunished: [],
-			miniGames: ['Math'],
+			miniGames: ['Math','Math2'],
 			numofplayers: 0,
 			playersAnswered: 0,
 			alivePlayers: 0,
@@ -33,7 +33,6 @@ exports.initGame = function (sio, socket) {
 		socket.leave(socket.id);
 	});
 	socket.on('addInRoom', (ID, name) => {
-		console.log(hosts);
 		if (hosts.length > 0) {
 			for (i = 0; i < hosts.length; i++) {
 				if ((hosts[i].gameid === ID) && (hosts[i].numofplayers < 8)) {
@@ -49,7 +48,6 @@ exports.initGame = function (sio, socket) {
 						score: 0,
 						answer: true
 					});
-					console.log(hosts[i].players);
 					socket.emit('getReady');
 					io.in(ID + 'host').emit('joinedServer', name);
 					return;
@@ -59,7 +57,6 @@ exports.initGame = function (sio, socket) {
 				}
 			}
 		} else {
-			console.log('ne voshel');
 			socket.emit('noroom');
 		}
 	});
@@ -74,7 +71,6 @@ exports.initGame = function (sio, socket) {
 		io.in(gameID + 'host').emit('hostQuestion', data[hosts[numberOfHost].round]);
 	});
 	socket.on('playerAnswered', (answer, numberOfHost) => {
-		console.log('NUMBAAA(playerAnswered)', numberOfHost);
 		let playerNumber;
 		hosts[numberOfHost].players.forEach((item, i) => {
 			if (item.socketid === socket.id) {
@@ -88,8 +84,6 @@ exports.initGame = function (sio, socket) {
 		hosts[numberOfHost].playersPunished=[];
 		hosts[numberOfHost].round++;
 		let i = hosts[numberOfHost].round;
-		console.log(i);
-		console.log('NUMBAAA', numberOfHost);
 		io.in(gameID).emit('questions', data[i], numberOfHost);
 		io.in(gameID + 'host').emit('hostQuestion', data[i]);
 	});
@@ -102,9 +96,7 @@ exports.initGame = function (sio, socket) {
 			case 'Math2':
 				math2(numberOfHost);
 		}
-		console.log(hosts[numberOfHost].miniGames);
-		// hosts[numberOfHost].miniGames.splice(rand, 1);
-		console.log(hosts[numberOfHost].miniGames);
+		hosts[numberOfHost].miniGames.splice(rand, 1);
 	});
 	socket.on('mathRight', (numberOfHost, booleanAnswer, playerName) => {
 		io.in(hosts[numberOfHost].gameid + 'host').emit('mathRoundAnswer', numberOfHost, playerName, booleanAnswer);
@@ -127,7 +119,6 @@ exports.initGame = function (sio, socket) {
 };
 
 function math(numberOfHost, socket) {
-	console.log(hosts[numberOfHost].playersPunished);
 	hosts[numberOfHost].playersPunished.forEach(item => {
 		io.sockets.sockets[item.socketid].emit('punishmentMath', numberOfHost, item.i);
 		setTimeout(() => {
@@ -142,9 +133,15 @@ function math(numberOfHost, socket) {
 
 function math2(numberOfHost, socket) {
 	hosts[numberOfHost].playersPunished.forEach(item => {
-		io.sockets.sockets[item.socketid].emit('punishmentMath2', numberOfHost, item.playerName);
+		io.sockets.sockets[item.socketid].emit('punishmentMath2', numberOfHost, item.i);
+		setTimeout(() => {
+			io.sockets.sockets[item.socketid].emit('endMath');
+		}, 15000);
 	});
 	io.in(hosts[numberOfHost].gameid + 'host').emit('punishmentMath2Host', numberOfHost, hosts[numberOfHost].playersPunished);
+	setTimeout(() => {
+		io.in(hosts[numberOfHost].gameid + 'host').emit('endMathHost', numberOfHost, hosts[numberOfHost].playersPunished);
+	}, 15000);
 }
 
 function playerAnswer(answer, numberOfHost, playerNumber) {
@@ -167,7 +164,6 @@ function playerAnswer(answer, numberOfHost, playerNumber) {
 	if (host.playersAnswered === host.numofplayers) {
 		let punish;
 		host.playersAnswered = 0;
-		console.log('VIDAL_GAMESTATS');
 		playersAnswered = 0;
 		if (host.playersPunished.length > 0) {
 			punish = true;

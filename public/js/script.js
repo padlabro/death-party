@@ -30,7 +30,6 @@ socket.on('hostQuestion', data => {
 });
 
 socket.on('questions', (data, numberOfHost) => {
-	console.log('questions',numberOfHost);
 	newQuestionPlayer(data, numberOfHost);
 });
 
@@ -59,7 +58,6 @@ function newQuestion(data) {
 }
 
 function newQuestionPlayer(data, numberOfHost) {
-	console.log('newQuestionPlayer',numberOfHost);
 	mainScreen.innerHTML = `
 	<div class="delete__question">
 	<div class="choises-player">
@@ -88,7 +86,6 @@ function linksAdd(selector, func, data) {
 }
 
 function linksQuestion(selector, numberOfHost) {
-	console.log('NUMBAAA',numberOfHost);
 	let playerSelect = document.querySelectorAll(selector);
 	playerSelect.forEach((item, i) => {
 		item.addEventListener('click', () => {
@@ -100,7 +97,6 @@ function linksQuestion(selector, numberOfHost) {
 }
 
 function classAdd(i, playerSelect, numberOfHost) {
-	console.log('NUMBAAA(CLASSADD)',numberOfHost);
 	const chosenAnswer = playerSelect[i];
 	chosenAnswer.classList.add('right-answer', 'choise-playerr');
 	chosenAnswer.classList.remove('choise-player');
@@ -287,6 +283,17 @@ socket.on('punishmentMathHost', (numberOfHost, playersDie) => {
 	});
 });
 
+socket.on('punishmentMath2Host', (numberOfHost, playersDie) => {
+	let deleteQuestion = document.querySelector('.delete__question');
+	deleteQuestion.innerHTML = ``;
+	playersDie.forEach(item => {
+		let playerResult = document.createElement('div');
+		playerResult.innerHTML = `<p class="player">${item.playerName}</p>
+			<p id="${item.i}" class="playerscore">0</p>`;
+		deleteQuestion.appendChild(playerResult);
+	});
+});
+
 socket.on('mathRoundAnswer', (numberOfHost, playerName, booleanAnswer) => {
 	let p = document.createElement('p');
 	if (booleanAnswer) {
@@ -384,17 +391,16 @@ socket.on('punishmentMath2', (numberOfHost, playerName) => {
 	mathGame();
 });
 
-socket.on('punishmentMath2Host', (numberOfHost, playersDie) => {
-	let deleteQuestion = document.querySelector('.delete__question');
-	deleteQuestion.innerHTML = ``;
-	playersDie.forEach(item => {
-		let playerResult = document.createElement('div');
-		playerResult.innerHTML = `<p class="player">${item.playerName}</p>
-			<p id="${item.playerName}">0</p>`;
-		deleteQuestion.appendChild(playerResult);
-	});
-	socket.emit('');
-});
+// socket.on('punishmentMath2Host', (numberOfHost, playersDie) => {
+// 	let deleteQuestion = document.querySelector('.delete__question');
+// 	deleteQuestion.innerHTML = ``;
+// 	playersDie.forEach(item => {
+// 		let playerResult = document.createElement('div');
+// 		playerResult.innerHTML = `<p class="player">${item.playerName}</p>
+// 			<p id="${item.playerName}" class="playerscore">0</p>`;
+// 		deleteQuestion.appendChild(playerResult);
+// 	});
+// });
 
 socket.on('math2RoundAnswer', (numberOfHost, playerName, booleanAnswer) => {
 	let p = document.createElement('p');
@@ -419,9 +425,7 @@ socket.on('endMath', () => {
 	`;
 });
 socket.on('endMathHost', (numberOfHost, playersDie) => {
-	console.log(playersDie);
 	const playersPunished = document.querySelectorAll('.playerscore');
-	console.log(playersPunished);
 	let mathArray = [];
 	let playersWin = [];
 	let playersLost = [];
@@ -451,7 +455,6 @@ socket.on('endMathHost', (numberOfHost, playersDie) => {
 	});
 	numberOfWinners.forEach(item => {
 		playersWin.push(playersPunished[item].getAttribute('id'));
-		console.log(playersWin);
 	});
 	numberOfLoosers.forEach(item=>{
 		playersLost.push(playersPunished[item].getAttribute('id'));
